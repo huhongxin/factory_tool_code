@@ -98,8 +98,10 @@ class SingletonWEBAPI:
                     nodeIdList.append(nodeInfo["nodeId"])
             else:
                 log.warning("get nodelist fail,%s", r_text)
+                log.error("检查一下问题，如果只是网络问题请再次重试运行程序")
         except Exception as e:
             log.error("get nodelist fail,%s",e)
+            log.error("检查一下问题，如果只是网络问题请再次重试运行程序")
         return nodeIdList
 
     def getLayout(self,layout):
@@ -216,9 +218,12 @@ if __name__ == "__main__":
             if n in nodeList:
                 nodeList.remove(n)
 
-    # 准备记录文件
-    webapi.prepareRecord(nodeList)
-    log.debug("将对列表中的display启动刷屏计划 = %s",nodeList)
+    if nodeList:
+        # 准备记录文件
+        webapi.prepareRecord(nodeList)
+        log.debug("将对列表中的display启动刷屏计划 = %s",nodeList)
 
-    # 启动任务
-    asyncio.run(main(nodeList))
+        # 启动任务
+        asyncio.run(main(nodeList))
+    else:
+        log.error("没有获取到任何一个display的id")
