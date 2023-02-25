@@ -1,1 +1,3 @@
 render_test/__pycache__
+render_test/record
+render_test/*.log
