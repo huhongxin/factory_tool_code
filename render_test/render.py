@@ -210,7 +210,9 @@ if __name__ == "__main__":
 
     # 如果config文件在TARTET_LIST指定了要刷屏的nodeId，就不自动获取了
     if config.TARGET_LIST:
-        nodeList = config.TARGET_LIST
+        for n in config.TARGET_LIST:
+            if n not in nodeList:
+                nodeList.append(n)
 
     # 如果config文件在NG_LIST中有不需要加入刷新的任务的display,就剔除
     if config.NG_LIST:
