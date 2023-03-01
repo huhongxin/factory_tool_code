@@ -42,6 +42,9 @@ MODE = HUB_PORTAL
 # 不想刷新的node，如果通过接口获取了某个hub下的所有node，但有一些node并不需要被更新，那么就将nodeid填到这里
 NG_LIST = []
 
+# 不合并从hub 的node接口获取到的nodeId
+NOT_MERGES = True
+
 # 不通过接口获取某个hub的node列表，直接指定要刷新nodeID
 TARGET_LIST = []
 
@@ -58,7 +61,7 @@ WAIT_RENDER_TIME_ONE = 20
 WAIT_RENDER_RESULT_CNT = 3
 
 # 两次推送layout的时间间隔(s)
-RENDER_INTERVAL_TWICE = 180
+RENDER_INTERVAL_TWICE = 90
 
 # 刷屏次数的记录，文件名
 FILE_RECORD = 'record'
