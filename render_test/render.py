@@ -10,7 +10,7 @@ from layout import SHOW_NODEID
 import config
 import time
 
-log.basicConfig(level=log.DEBUG)
+log.basicConfig(level=log.INFO)
 
 class SingletonWEBAPI:
     __instance = None
@@ -165,10 +165,11 @@ class SingletonWEBAPI:
                     await asyncio.sleep(wait)# 停60s后再post
                     continue
 
-                # 等待结果, 最多等10分钟
+                # 等待结果, 等待的时间是config.WAIT_RENDER_TIME_ONE x config.WAIT_RENDER_TIME_ONE
                 waitCnt = 0
                 while True:
                     try:
+                        await asyncio.sleep(config.WAIT_RENDER_TIME_ONE)
                         r = httpx.get(url = self.pathGetRenderSta(renderId))
                         r_text = json.loads(r.text)
                         if r_text.get('code') == 200:
@@ -183,7 +184,6 @@ class SingletonWEBAPI:
                         log.warning("%s render timeout, giveup this render", nodeId)
                         break
                     log.debug("%s get render result fail, after %ds retry", nodeId,config.WAIT_RENDER_TIME_ONE)
-                    await asyncio.sleep(config.WAIT_RENDER_TIME_ONE)
 
             self.setStatus(nodeId, isRendered)
             # 等待下一个推送周期
