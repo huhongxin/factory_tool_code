@@ -189,16 +189,12 @@ class SingletonWEBAPI:
             self.setStatus(nodeId, isRendered)
 
             # 钉钉推送通知
-            if not isRendered:
-                log.info("%s render 失败", nodeId)
-                self.pushDingDingNotify()
-            else:
-                self.pushDingDingNotify()# 如果需要成功也发送，就解开这两句
+            self.pushDingDingNotify(isRendered)
 
             # 等待下一个推送周期
             await asyncio.sleep(config.RENDER_INTERVAL_TWICE)
 
-    def pushDingDingNotify(self):
+    def pushDingDingNotify(self, isRendered):
         if config.ENABLE_DINGDING_NOTIFY:
             # 发送的消息内容
             message = {
@@ -207,9 +203,17 @@ class SingletonWEBAPI:
                     "content": str(self.status)
                 }
             }
-            response = httpx.post(config.WEBHOOK_URL, json=message)
-            if response.status_code != 200:
-                log.info("钉钉消息推送失败")
+            needPush = False
+            if config.NOTIFY_ONLY_FAIL:
+                if not isRendered:
+                    needPush = True
+            else:
+                needPush = True
+
+            if needPush == True:
+                response = httpx.post(config.WEBHOOK_URL, json=message)
+                if response.status_code != 200:
+                    log.info("钉钉消息推送失败") 
 
     def prepareRecord(self, nodeList):
         # 如果有此前的记录,就加载进来

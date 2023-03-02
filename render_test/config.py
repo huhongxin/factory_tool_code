@@ -66,6 +66,12 @@ RENDER_INTERVAL_TWICE = 90
 # 刷屏次数的记录，文件名
 FILE_RECORD = 'record'
 
-# 钉钉机器人
+# 钉钉机器人的配置
+# 开启通知
 ENABLE_DINGDING_NOTIFY = True
+
+# 只有失败的时候才通知
+NOTIFY_ONLY_FAIL = True
+
+# 通知的链接
 WEBHOOK_URL = "https://oapi.dingtalk.com/robot/send?access_token=f18c08a42fb065a8151a6630dfad98bd3e15a4c8dd3441f15fa526fb8d7e4339"
