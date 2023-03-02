@@ -199,16 +199,17 @@ class SingletonWEBAPI:
             await asyncio.sleep(config.RENDER_INTERVAL_TWICE)
 
     def pushDingDingNotify(self):
-        # 发送的消息内容
-        message = {
-            "msgtype": "text",
-            "text": {
-                "content": str(self.status)
+        if config.ENABLE_DINGDING_NOTIFY:
+            # 发送的消息内容
+            message = {
+                "msgtype": "text",
+                "text": {
+                    "content": str(self.status)
+                }
             }
-        }
-        response = httpx.post(config.WEBHOOK_URL, json=message)
-        if response.status_code != 200:
-            log.info("钉钉消息推送失败")
+            response = httpx.post(config.WEBHOOK_URL, json=message)
+            if response.status_code != 200:
+                log.info("钉钉消息推送失败")
 
     def prepareRecord(self, nodeList):
         # 如果有此前的记录,就加载进来

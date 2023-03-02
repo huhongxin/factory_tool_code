@@ -67,4 +67,5 @@ RENDER_INTERVAL_TWICE = 90
 FILE_RECORD = 'record'
 
 # 钉钉机器人
+ENABLE_DINGDING_NOTIFY = True
 WEBHOOK_URL = "https://oapi.dingtalk.com/robot/send?access_token=f18c08a42fb065a8151a6630dfad98bd3e15a4c8dd3441f15fa526fb8d7e4339"
