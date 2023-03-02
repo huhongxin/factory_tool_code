@@ -185,9 +185,30 @@ class SingletonWEBAPI:
                         break
                     log.debug("%s get render result fail, after %ds retry", nodeId,config.WAIT_RENDER_TIME_ONE)
 
+            # 本地记录
             self.setStatus(nodeId, isRendered)
+
+            # 钉钉推送通知
+            if not isRendered:
+                log.info("%s render 失败", nodeId)
+                self.pushDingDingNotify()
+            else:
+                self.pushDingDingNotify()# 如果需要成功也发送，就解开这两句
+
             # 等待下一个推送周期
             await asyncio.sleep(config.RENDER_INTERVAL_TWICE)
+
+    def pushDingDingNotify(self):
+        # 发送的消息内容
+        message = {
+            "msgtype": "text",
+            "text": {
+                "content": str(self.status)
+            }
+        }
+        response = httpx.post(config.WEBHOOK_URL, json=message)
+        if response.status_code != 200:
+            log.info("钉钉消息推送失败")
 
     def prepareRecord(self, nodeList):
         # 如果有此前的记录,就加载进来
