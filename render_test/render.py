@@ -99,7 +99,9 @@ class SingletonWEBAPI:
             if r_text["code"] == 200:
                 for nodeInfo in r_text["data"]:
                     self.nodeInfo[nodeInfo["nodeId"]] = nodeInfo
-                    if config.ONLYBLE and nodeInfo.get("type",'') != 'BLE_DISPLAY':
+                    if config.MODE == config.HUB_PORTAL and config.ONLYBLE and nodeInfo.get("type",'') != 'BLE_DISPLAY':
+                        continue
+                    elif config.ONLYBLE and nodeInfo.get("model",'') != 'D29C-LE' and nodeInfo.get("model",'') != 'D42C-LE' and nodeInfo.get("model",'') != 'D75C-LEWI':
                         continue
                     nodeIdList.append(nodeInfo["nodeId"])
             else:
@@ -153,10 +155,8 @@ class SingletonWEBAPI:
                     l["data"]["text"] = "ok={:},fail={:}".format(self.status[nodeId]['success'],self.status[nodeId]['fail']) 
 
             isRendered = False
-            if self.nodeInfo.get(nodeId,{}).get("model", '') == "D75C_LEWI":
+            if config.MODE == config.HUB_PORTAL and self.nodeInfo.get(nodeId,{}).get("model", '') == "D75C_LEWI":
                 # 如果是D75C-LEWI
-                # TODO,只能往云服务器post render，然后在trigger
-                if config.MODE == config.HUB_PORTAL:
                     log.debug("trigger for %s", nodeId)
                     # hub portal API可以唤醒7.5inch
                     if self.setTriggers(nodeId):
