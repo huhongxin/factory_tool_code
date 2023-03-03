@@ -67,6 +67,9 @@ class SingletonWEBAPI:
     def pathGetNodeId(self,HUB_SN):
         return config.URL + config.API_KEY +"/devices/" + HUB_SN + "/nodes"
 
+    def pathGetBleNodeId(self):
+        return config.URL + config.API_KEY + "/nodes"
+
     def pathSetTriggers(self, nodeId):
         return config.URL + config.API_KEY + "/nodes/" + nodeId + "/triggers"
 
@@ -87,9 +90,12 @@ class SingletonWEBAPI:
     def getNodeIdList(self,HUB_SN):
         nodeIdList = []
         try:
-            r = httpx.get(self.pathGetNodeId(HUB_SN))
+            if config.MODE == config.HUB_PORTAL:
+                r = httpx.get(self.pathGetNodeId())
+            else:
+                r = httpx.get(self.pathGetBleNodeId())
             r_text = json.loads(r.text)
-            # log.debug(r_text)
+            # log.info(r_text)
             if r_text["code"] == 200:
                 for nodeInfo in r_text["data"]:
                     self.nodeInfo[nodeInfo["nodeId"]] = nodeInfo
@@ -177,9 +183,10 @@ class SingletonWEBAPI:
                                 log.info("%s render success", nodeId)
                                 isRendered = True
                                 break
+                            else:
+                                waitCnt += 1
                     except Exception as e:
                         pass
-                    waitCnt += 1
                     if waitCnt > config.WAIT_RENDER_RESULT_CNT:
                         log.warning("%s render timeout, giveup this render", nodeId)
                         break

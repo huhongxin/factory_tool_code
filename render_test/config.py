@@ -21,16 +21,16 @@ HUB_PORTAL = 1
 CLOUD = 2
 
 # sops 服务器配置示例
-# URL = "https://sops.moxiv.com/api/v2/key/"
-# API_KEY = "6fae53dc-1bad-428e-83ea-54c737bdeb66"
-# HUB = "MCF008D166AD18"
-# MODE = SOPS
+URL = "http://192.168.66.59/api/v2/key/"
+API_KEY = "7adc7da1-16e8-461e-bc93-9b59093a6a94"
+HUB = "MC1097BD4052C4"
+MODE = SOPS
 
 # hub portal API，配置示例
-URL = "http://192.168.66.80/key/"
-API_KEY = "e8db079d-9113-7abc-83eb-5baf819e583f"
-HUB = "MC90380C612CC0"
-MODE = HUB_PORTAL
+# URL = "http://192.168.66.80/key/"
+# API_KEY = "e8db079d-9113-7abc-83eb-5baf819e583f"
+# HUB = "MC90380C612CC0"
+# MODE = HUB_PORTAL
 
 # 云服务器API，配置示例
 # URL = "https://api.sync-sign.com/v2/key/"
@@ -61,7 +61,7 @@ WAIT_RENDER_TIME_ONE = 20
 WAIT_RENDER_RESULT_CNT = 9
 
 # 两次推送layout的时间间隔(s)
-RENDER_INTERVAL_TWICE = 90
+RENDER_INTERVAL_TWICE = 60
 
 # 刷屏次数的记录，文件名
 FILE_RECORD = 'record'
