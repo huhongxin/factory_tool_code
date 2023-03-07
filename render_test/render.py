@@ -22,6 +22,7 @@ class SingletonWEBAPI:
             SingletonWEBAPI.__instance = self
             self.status = {}
             self.nodeInfo = {}
+            self.taskMap  = {}
             self.nodeNumber = 0
             self.modifyCount = 0
             self.layout = self.getLayout(SHOW_NODEID)
@@ -87,20 +88,21 @@ class SingletonWEBAPI:
         return beijing_now.strftime('%a, %b %d %H:%M')
 
     # GET NODE LIST IN HUB
-    def getNodeIdList(self,HUB_SN):
+    def getNodeIdList(self):
         nodeIdList = []
         try:
             if config.MODE == config.HUB_PORTAL:
-                r = httpx.get(self.pathGetNodeId())
+                r = httpx.get(self.pathGetNodeId(config.HUB))
             else:
                 r = httpx.get(self.pathGetBleNodeId())
             r_text = json.loads(r.text)
-            # log.info(r_text)
+            log.info(r_text)
             if r_text["code"] == 200:
                 for nodeInfo in r_text["data"]:
                     self.nodeInfo[nodeInfo["nodeId"]] = nodeInfo
-                    if config.MODE == config.HUB_PORTAL and config.ONLYBLE and nodeInfo.get("type",'') != 'BLE_DISPLAY':
-                        continue
+                    if config.MODE == config.HUB_PORTAL:
+                        if config.ONLYBLE and nodeInfo.get("type",'') != 'BLE_DISPLAY':
+                            continue
                     elif config.ONLYBLE and nodeInfo.get("model",'') != 'D29C-LE' and nodeInfo.get("model",'') != 'D42C-LE' and nodeInfo.get("model",'') != 'D75C-LEWI':
                         continue
                     nodeIdList.append(nodeInfo["nodeId"])
@@ -144,6 +146,21 @@ class SingletonWEBAPI:
             log.warning("%s %s", nodeId, e)
         return None
 
+    async def monitor(self):
+        while True:
+            log.info("monitor task after %ds to check...", config.MONITOR_SLEEP_TIME * 60)
+            await asyncio.sleep( config.MONITOR_SLEEP_TIME * 60)
+            for n in self.taskMap:
+                now = int(time.time())
+                if now - self.taskMap[n]['feedDogTime'] > config.MONITOR_TIME * 1000:
+                    try:
+                        self.taskMap[n]['taskObj'].cancle()
+                    except Exception as e:
+                        log.warning("%s stop render task fail,%s", n, e)
+                    self.taskMap[n]['taskObj'] = asyncio.create_task(self.renderTask(n))
+                    self.taskMap[n]['feedDogTime'] = now
+                    log.info("create new render task for %s", n)
+
     async def renderTask(self, nodeId):
         while True:
             for l in self.layout["layout"]["items"]:
@@ -152,7 +169,7 @@ class SingletonWEBAPI:
                 if l["data"]["id"] == "NODE_ID":
                     l["data"]["text"] = nodeId
                 if l["data"]["id"] == "SUCCESS_STA":
-                    l["data"]["text"] = "ok={:},fail={:}".format(self.status[nodeId]['success'],self.status[nodeId]['fail']) 
+                    l["data"]["text"] = "ok={:},fail={:}".format(self.status.get(nodeId,{}).get('success',0), self.status.get(nodeId,{}).get('faill',0))
 
             isRendered = False
             if config.MODE == config.HUB_PORTAL and self.nodeInfo.get(nodeId,{}).get("model", '') == "D75C_LEWI":
@@ -170,7 +187,8 @@ class SingletonWEBAPI:
                     log.warning("%s post layout fail, after %ds retry", nodeId, wait)
                     await asyncio.sleep(wait)# 停60s后再post
                     continue
-
+                # 喂狗
+                self.taskMap[nodeId]['feedDogTime'] = int(time.time())
                 # 等待结果, 等待的时间是config.WAIT_RENDER_TIME_ONE x config.WAIT_RENDER_TIME_ONE
                 waitCnt = 0
                 while True:
@@ -197,6 +215,9 @@ class SingletonWEBAPI:
 
             # 钉钉推送通知
             self.pushDingDingNotify(isRendered)
+
+            # 喂狗
+            self.taskMap[nodeId]['feedDogTime'] = int(time.time())
 
             # 等待下一个推送周期
             await asyncio.sleep(config.RENDER_INTERVAL_TWICE)
@@ -231,15 +252,26 @@ class SingletonWEBAPI:
 
 async def main(nodeList):
     webapi = SingletonWEBAPI.getInstance()
-    tasks = [asyncio.create_task(webapi.renderTask(nodeList[i])) for i in range(len(nodeList))]
-    await asyncio.gather(*tasks)
+    tasks = []
+
+    # 启动render task
+    for i in range(len(nodeList)):
+        task = asyncio.create_task(webapi.renderTask(nodeList[i]))
+        tasks.append(task)
+        webapi.taskMap[nodeList[i]] = {"taskObj" : task, "feedDogTime" : int(time.time())}
+    # tasks = [asyncio.create_task(webapi.renderTask(nodeList[i])) for i in range(len(nodeList))]
+
+    # 启动monitor
+    tasks.append(asyncio.create_task(webapi.monitor()))
+    if tasks:
+        await asyncio.gather(*tasks)
 
 if __name__ == "__main__":
     webapi = SingletonWEBAPI.getInstance()
     nodeList = []
 
     # 获取nodeList，这个请求也获取了nodeInfo并保存
-    nodeList = webapi.getNodeIdList(config.HUB)
+    nodeList = webapi.getNodeIdList()
 
     # 如果config文件在TARTET_LIST指定了要刷屏的nodeId，就不自动获取了
     if config.TARGET_LIST:

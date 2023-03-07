@@ -75,3 +75,9 @@ NOTIFY_ONLY_FAIL = True
 
 # 通知的链接
 WEBHOOK_URL = "https://oapi.dingtalk.com/robot/send?access_token=f18c08a42fb065a8151a6630dfad98bd3e15a4c8dd3441f15fa526fb8d7e4339"
+
+# 监控刷屏任务有没有死，如果n分钟都没有更新时间戳，就任务任务死了，需要重新运行render任务(min)
+MONITOR_TIME = 10
+
+# 监控器检查任务的时间间隔(min)
+MONITOR_SLEEP_TIME = 3
