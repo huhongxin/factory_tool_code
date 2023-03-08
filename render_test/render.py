@@ -169,7 +169,7 @@ class SingletonWEBAPI:
                 if l["data"]["id"] == "NODE_ID":
                     l["data"]["text"] = nodeId
                 if l["data"]["id"] == "SUCCESS_STA":
-                    l["data"]["text"] = "ok={:},fail={:}".format(self.status.get(nodeId,{}).get('success',0), self.status.get(nodeId,{}).get('faill',0))
+                    l["data"]["text"] = "ok={:},fail={:}".format(self.status.get(nodeId,{}).get('success',0), self.status.get(nodeId,{}).get('fail',0))
 
             isRendered = False
             if config.MODE == config.HUB_PORTAL and self.nodeInfo.get(nodeId,{}).get("model", '') == "D75C_LEWI":
