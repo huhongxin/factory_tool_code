@@ -96,7 +96,7 @@ class SingletonWEBAPI:
             else:
                 r = httpx.get(self.pathGetBleNodeId())
             r_text = json.loads(r.text)
-            log.info(r_text)
+            log.debug(r_text)
             if r_text["code"] == 200:
                 for nodeInfo in r_text["data"]:
                     self.nodeInfo[nodeInfo["nodeId"]] = nodeInfo
@@ -105,7 +105,10 @@ class SingletonWEBAPI:
                             continue
                     elif config.ONLYBLE and nodeInfo.get("model",'') != 'D29C-LE' and nodeInfo.get("model",'') != 'D42C-LE' and nodeInfo.get("model",'') != 'D75C-LEWI':
                         continue
-                    nodeIdList.append(nodeInfo["nodeId"])
+                    if config.LOOK_MESSAGE_AGENTS:
+                        nodeIdList.append({nodeInfo["nodeId"]:nodeInfo['messageAgents']})
+                    else:
+                        nodeIdList.append(nodeInfo["nodeId"])
             else:
                 log.warning("get nodelist fail,%s", r_text)
                 log.error("检查一下问题，如果只是网络问题请再次重试运行程序")
@@ -272,28 +275,38 @@ if __name__ == "__main__":
 
     # 获取nodeList，这个请求也获取了nodeInfo并保存
     nodeList = webapi.getNodeIdList()
-
-    # 如果config文件在TARTET_LIST指定了要刷屏的nodeId，就不自动获取了
-    if config.TARGET_LIST:
-        if not config.NOT_MERGES:
-            for n in config.TARGET_LIST:
-                if n not in nodeList:
-                    nodeList.append(n)
-        else:
-            nodeList = config.TARGET_LIST
-
-    # 如果config文件在NG_LIST中有不需要加入刷新的任务的display,就剔除
-    if config.NG_LIST:
-        for n in config.NG_LIST:
-            if n in nodeList:
-                nodeList.remove(n)
-
-    if nodeList:
-        # 准备记录文件
-        webapi.prepareRecord(nodeList)
-        log.debug("将对列表中的display启动刷屏计划 = %s",nodeList)
-
-        # 启动任务
-        asyncio.run(main(nodeList))
+    if config.LOOK_MESSAGE_AGENTS:
+        nodeCnt = 0
+        for n in nodeList:
+            # n = {nodeId : [{'type': 'HUB_PAN', 'data': {'sn': 'MC943CC60175D8'}}, {'type': 'HUB_PAN', 'data': {'sn': 'MC1097BD4052C4'}}]}
+            for nd in n:
+                messageAgents = ''
+                for i in n[nd]:
+                    messageAgents += i['data']['sn'] + ","
+                log.info("%s : %s", nd , messageAgents)
+        log.info("total node %d",len(nodeList))
     else:
-        log.error("没有获取到任何一个display的id")
+        # 如果config文件在TARTET_LIST指定了要刷屏的nodeId，就不自动获取了
+        if config.TARGET_LIST:
+            if not config.NOT_MERGES:
+                for n in config.TARGET_LIST:
+                    if n not in nodeList:
+                        nodeList.append(n)
+            else:
+                nodeList = config.TARGET_LIST
+
+        # 如果config文件在NG_LIST中有不需要加入刷新的任务的display,就剔除
+        if config.NG_LIST:
+            for n in config.NG_LIST:
+                if n in nodeList:
+                    nodeList.remove(n)
+
+        if nodeList:
+            # 准备记录文件
+            webapi.prepareRecord(nodeList)
+            log.debug("将对列表中的display启动刷屏计划 = %s",nodeList)
+
+            # 启动任务
+            asyncio.run(main(nodeList))
+        else:
+            log.error("没有获取到任何一个display的id")

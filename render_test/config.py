@@ -20,24 +20,29 @@ SOPS = 0
 HUB_PORTAL = 1
 CLOUD = 2
 
-# sops 服务器配置示例
-URL = "http://192.168.66.59/api/v2/key/"
-API_KEY = "7adc7da1-16e8-461e-bc93-9b59093a6a94"
-HUB = "MC1097BD4052C4"
+# 设置这里选择服务器类型
 MODE = SOPS
 
-# hub portal API，配置示例
-# URL = "http://192.168.66.80/key/"
-# API_KEY = "e8db079d-9113-7abc-83eb-5baf819e583f"
-# HUB = "MC90380C612CC0"
-# MODE = HUB_PORTAL
+if MODE == SOPS:
+    # sops 服务器配置示例
+    URL = "http://192.168.66.59/api/v2/key/"
+    API_KEY = "39468653-092d-4b7f-ac0a-ef21668ee11a"
+    HUB = "MC1097BD4052C4"
 
-# 云服务器API，配置示例
-# URL = "https://api.sync-sign.com/v2/key/"
-# API_KEY = "71e6c4e6-530c-4d7d-b2ea-551d6d1671e6"
-# HUB = 'MC1C9DC2585C04'
-# MODE = CLOUD
+elif MODE == HUB_PORTAL:
+    # hub portal API，配置示例
+    URL = "http://192.168.66.80/key/"
+    API_KEY = "e8db079d-9113-7abc-83eb-5baf819e583f"
+    HUB = "MC90380C612CC0"
 
+elif MODE == CLOUD:
+    # 云服务器API，配置示例
+    URL = "https://api.sync-sign.com/v2/key/"
+    API_KEY = "71e6c4e6-530c-4d7d-b2ea-551d6d1671e6"
+    HUB = 'MC1C9DC2585C04'
+
+else:
+    print("!!! NO SET SERVER INFO !!!!!")
 
 # 不想刷新的node，如果通过接口获取了某个hub下的所有node，但有一些node并不需要被更新，那么就将nodeid填到这里
 NG_LIST = []
@@ -81,3 +86,6 @@ MONITOR_TIME = 10
 
 # 监控器检查任务的时间间隔(min)
 MONITOR_SLEEP_TIME = 3
+
+# 选择功能: 只获取nodeList和MessageAgents
+LOOK_MESSAGE_AGENTS = True
