@@ -282,7 +282,7 @@ if __name__ == "__main__":
     for n in config.NG_LIST:
         if n in nodeList:
             nodeList.remove(n)
-
+    log.info("display count = %d,%s",len(nodeList), nodeList)
     if nodeList:
         # 准备记录文件
         webapi.prepareRecord(nodeList)
