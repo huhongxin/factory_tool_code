@@ -72,7 +72,7 @@ NOTIFY_ONLY_FAIL = True # 只有失败的时候才通知
 WEBHOOK_URL = "https://oapi.dingtalk.com/robot/send?access_token=f18c08a42fb065a8151a6630dfad98bd3e15a4c8dd3441f15fa526fb8d7e4339"
 
 # 刷屏次数的记录，文件名
-FILE_RECORD = 'record'
+FILE_RECORD = 'record.json'
 
 # 显示时间用到的时区
 TIME_ZONE = 8 # 时区是8

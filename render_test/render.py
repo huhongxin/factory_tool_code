@@ -53,14 +53,14 @@ class SingletonWEBAPI:
             self.writeFile()
 
     def writeFile(self):
-        with open(config.FILE_RECORD, 'w+') as r:
-            r.write(json.dumps(self.status))
+        with open(config.FILE_RECORD, 'w+') as file:
+            json.dump(self.status, file)
         log.info("save file ok")
 
     def readFile(self):
         try:
-            with open(config.FILE_RECORD, 'r') as r:
-                self.status = json.loads(r.read())
+            with open(config.FILE_RECORD, 'r') as file:
+                self.status = json.load(file.read())
                 log.info("read data from file: %s",self.status)
         except IOError:
             log.info("not exit file %s", config.FILE_RECORD)
