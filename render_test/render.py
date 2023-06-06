@@ -60,7 +60,7 @@ class SingletonWEBAPI:
     def readFile(self):
         try:
             with open(config.FILE_RECORD, 'r') as file:
-                self.status = json.load(file.read())
+                self.status = json.load(file)
                 log.info("read data from file: %s",self.status)
         except IOError:
             log.info("not exit file %s", config.FILE_RECORD)
