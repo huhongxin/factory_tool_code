@@ -57,10 +57,10 @@ TARGET_DISPLAY_MODEL = SERVER_TYPEL_D75
 NG_LIST = []
 
 # 每次请求isRender结果的间隔(s)
-WAIT_RENDER_TIME_ONE = 20
+WAIT_RENDER_TIME_ONE = 60
 
 # 请求isRender结果的最大次数
-WAIT_RENDER_RESULT_CNT = 9
+WAIT_RENDER_RESULT_CNT = 10
 
 # 两次推送layout的时间间隔(s),就是获取了上一次的isRender结果以后，到下一次post render的间隔
 RENDER_INTERVAL_TWICE = 60
@@ -69,7 +69,7 @@ RENDER_INTERVAL_TWICE = 60
 ENABLE_DINGDING_NOTIFY = True # 开启通知
 NOTIFY_ONLY_FAIL = True # 只有失败的时候才通知
 # 通知的链接
-WEBHOOK_URL = "https://oapi.dingtalk.com/robot/send?access_token=f18c08a42fb065a8151a6630dfad98bd3e15a4c8dd3441f15fa526fb8d7e4339"
+WEBHOOK_URL = "https://oapi.dingtalk.com/robot/send?access_token=119b3020bcf729df0a5c46d00c967a9b281af35761959bee8b57c56618d1c975"
 
 # 刷屏次数的记录，文件名
 FILE_RECORD = 'record.json'
